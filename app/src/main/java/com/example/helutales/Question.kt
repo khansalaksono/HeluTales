@@ -2,11 +2,8 @@ package com.example.helutales
 
 data class Question(
     val description: String,
-    val options: List<String>,
     val answer: Int,
-    val explanation: String
-) {
-    fun isAnswerCorrect(userAnswer: Int): Boolean {
-        return answer == userAnswer
-    }
-}
+    val options: List<String>,
+    val explanation: String,
+    var userAnswer: Int? = null // Nullable to represent no user answer initially
+)

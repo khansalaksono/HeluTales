@@ -7,30 +7,29 @@ import com.google.firebase.firestore.FirebaseFirestore
 
 class MainViewModel : ViewModel() {
 
-    private val _quizList = MutableLiveData<List<Quiz>>()
-    val quizList: LiveData<List<Quiz>> get() = _quizList
+    // LiveData to hold the list of quizzes
+    private val _quizzes = MutableLiveData<List<Quiz>>()
+    val quizzes: LiveData<List<Quiz>> get() = _quizzes
 
-    init {
-        // Load quiz titles when the ViewModel is initialized
-        loadQuizTitles()
-    }
+    // Initialize Firestore
+    val db = FirebaseFirestore.getInstance()
 
-    private fun loadQuizTitles() {
-        val db = FirebaseFirestore.getInstance()
-        val quizzesCollection = db.collection("quizzes")
 
-        quizzesCollection.get()
-            .addOnSuccessListener { querySnapshot ->
-                val quizList = mutableListOf<Quiz>()
-                for (document in querySnapshot.documents) {
-                    val quizTitle = document.getString("title") ?: ""
-                    val quiz = Quiz(quizTitle) // Assuming a Quiz constructor that takes a title
-                    quizList.add(quiz)
-                }
-                _quizList.value = quizList
+    // Function to fetch the list of quizzes
+    // Inside your ViewModel or Repository
+    fun fetchQuizzes() {
+        db.collection("quizzes")
+            .get()
+            .addOnSuccessListener { result ->
+                // Convert the result to a list of Quiz objects
+                val quizzes = result.toObjects(Quiz::class.java)
+                // Update LiveData or use a callback to notify the UI
+                _quizzes.postValue(quizzes)
             }
-            .addOnFailureListener { e ->
-                // Handle the error
+            .addOnFailureListener { exception ->
+                // Handle errors
+                // Log.e(TAG, "Error getting documents: ", exception)
             }
     }
+
 }

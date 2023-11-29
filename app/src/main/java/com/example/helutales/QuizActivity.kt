@@ -1,60 +1,84 @@
+package com.example.helutales
+
 import android.os.Bundle
-import androidx.activity.viewModels
+import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
 import com.example.helutales.databinding.ActivityQuizBinding
 
 class QuizActivity : AppCompatActivity() {
+
     private lateinit var binding: ActivityQuizBinding
-    private val viewModel: QuizViewModel by viewModels()
+    private lateinit var questionViewModel: QuestionViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityQuizBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // Observe changes in the quiz state
-        viewModel.quizState.observe(this, Observer { state ->
-            when (state) {
-                is QuizState.ShowQuestion -> showQuestion(state.quiz)
-                is QuizState.ShowResult -> showResult(state.score)
-                else -> {}
+        // Initialize QuestionViewModel
+        questionViewModel = ViewModelProvider(this).get(QuestionViewModel::class.java)
+
+        // Retrieve the selected quiz and display the first question
+        val quiz = intent.getSerializableExtra("QUIZ_EXTRA") as Quiz
+        questionViewModel.setCurrentQuestion(quiz.questions[0])
+
+        // Observe the current question LiveData and update UI accordingly
+        questionViewModel.currentQuestion.observe(this, Observer { currentQuestion ->
+            if (currentQuestion != null) {
+                displayQuestion(currentQuestion)
             }
         })
 
-        // Handle user clicks on options
-        binding.option1.setOnClickListener { viewModel.onOptionSelected(1) }
-        binding.option2.setOnClickListener { viewModel.onOptionSelected(2) }
-        binding.option3.setOnClickListener { viewModel.onOptionSelected(3) }
-        binding.option4.setOnClickListener { viewModel.onOptionSelected(4) }
+        // Set up click listeners for answer options
+        binding.option1.setOnClickListener { onOptionSelected(0) }
+        binding.option2.setOnClickListener { onOptionSelected(1) }
+        binding.option3.setOnClickListener { onOptionSelected(2) }
+        binding.option4.setOnClickListener { onOptionSelected(3) }
 
-        // Start the quiz when the activity is created
-        viewModel.startQuiz()
+        // Other initialization code...
     }
 
-    // Replace with your actual logic to display a question
-    private fun showQuestion(quiz: Quiz) {
+    // Function to display the current question
+    private fun displayQuestion(question: Question) {
         // Update UI to display the current question
-        binding.questionTextView.text = quiz.description
-        binding.option1.text = quiz.options[0]
-        binding.option2.text = quiz.options[1]
-        binding.option3.text = quiz.options[2]
-        binding.option4.text = quiz.options[3]
+        binding.questionTextView.text = question.description
+        binding.option1.text = question.options[0]
+        binding.option2.text = question.options[1]
+        binding.option3.text = question.options[2]
+        binding.option4.text = question.options[3]
 
         // Additional logic to handle UI changes for question display
         // ...
     }
 
-    // Replace with your actual logic to display the result
-    private fun showResult(score: Int) {
-        // Update UI to display the quiz result
-        binding.resultTextView.text = "Your score: $score"
+    // Function to handle user clicks on answer options
+    private fun onOptionSelected(selectedOption: Int) {
+        // Get the current question from the ViewModel
+        val currentQuestion = questionViewModel.currentQuestion.value
 
-        // Additional logic to handle UI changes for result display
+        if (currentQuestion != null) {
+            // Update the user's answer in the current question
+            currentQuestion.userAnswer = selectedOption
+
+            // Optionally, you can perform additional logic here
+            // For example, highlight the selected option or show feedback
+
+            // Move to the next question or handle quiz completion
+            moveToNextQuestionOrCompleteQuiz()
+        }
+    }
+
+    // Function to move to the next question or complete the quiz
+    private fun moveToNextQuestionOrCompleteQuiz() {
+        // Implement logic to move to the next question or complete the quiz
+        // You can check if there are more questions or navigate to the result screen
         // ...
     }
-}
 
+    // Other methods...
+}
 
 //import android.os.Bundle
 //import androidx.appcompat.app.AppCompatActivity
