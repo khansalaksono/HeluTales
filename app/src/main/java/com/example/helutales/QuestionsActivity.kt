@@ -56,10 +56,11 @@ class QuestionsActivity : AppCompatActivity() {
         if (quizTitle != null) {
             firestore.collection("quizzes").whereEqualTo("title", quizTitle)
                 .get()
-                .addOnSuccessListener {
-                    if (it != null && !it.isEmpty) {
-                        quizzes = it.toObjects(Quiz::class.java)
-                        questions = quizzes!![0].questions
+                .addOnSuccessListener { result ->
+                    if (result != null && !result.isEmpty) {
+                        val document = result.documents[0]
+                        val quiz = document.toObject(Quiz::class.java)
+                        questions = quiz?.questions?.toMutableMap()
                         bindViews()
                     }
                 }
