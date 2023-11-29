@@ -1,3 +1,7 @@
 package com.example.helutales
 
-data class Quiz(val title: String, val questions: Map<String, Any>)
+import java.io.Serializable
+
+data class Quiz(
+    val title: String,
+    val questions: List<Question>) : Serializable
