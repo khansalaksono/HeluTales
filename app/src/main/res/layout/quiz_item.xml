@@ -22,7 +22,6 @@
             android:textSize="18sp"
             android:textStyle="bold"/>
 
-        <!-- Add more TextViews for displaying questions, etc. -->
 
     </LinearLayout>
 </androidx.cardview.widget.CardView>
