@@ -4,4 +4,5 @@ import java.io.Serializable
 
 data class Quiz(
     val title: String,
-    val questions: List<Question>) : Serializable
+    val questions: MutableMap<String, Question> = mutableMapOf()
+)

@@ -1,82 +1,97 @@
 package com.example.helutales
 
+import android.content.Intent
 import android.os.Bundle
+import android.util.Log
+import android.view.View
 import android.widget.Button
-import android.widget.RadioButton
-import android.widget.RadioGroup
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.gson.Gson
 
 class QuestionsActivity : AppCompatActivity() {
 
-    private lateinit var quiz: Quiz
-    private var currentQuestionIndex: Int = 0
+    var quizzes: MutableList<Quiz>? = null
+    var questions: MutableMap<String, Question>? = null
+    var index = 1
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_questions)
-
-        quiz = intent.getSerializableExtra("quiz") as Quiz
-        showQuestion(currentQuestionIndex)
-
-        // Set OnClickListener for the "Next" button
-        val nextButton: Button = findViewById(R.id.nextButton)
-        nextButton.setOnClickListener {
-            if (currentQuestionIndex < quiz.questions.size - 1) {
-                currentQuestionIndex++
-                showQuestion(currentQuestionIndex)
-            } else {
-                // Last question, handle submission or completion
-                handleQuizCompletion()
-            }
-        }
-
-//        val questions = intent.getStringExtra("questions")
-//        // Handle the questions and display them in your QuestionsActivity
-//        // For simplicity, you can use a TextView or any other UI component
-//        val questionsTextView: TextView = findViewById(R.id.questionsTextView)
-//        questionsTextView.text = questions
+        setContentView(R.layout.activity_question)
+        setUpFirestore()
+        setUpEventListener()
     }
-    private fun showQuestion(index: Int) {
-        if (quiz.questions.isEmpty()) {
-            // Handle the case where there are no questions
-            return
+
+    private fun setUpEventListener() {
+        val btnPrevious = findViewById<Button>(R.id.btnPrevious)
+        val btnNext = findViewById<Button>(R.id.btnNext)
+        val btnSubmit = findViewById<Button>(R.id.btnSubmit)
+        btnPrevious.setOnClickListener {
+            index--
+            bindViews()
         }
 
-        val question = quiz.questions[index]
+        btnNext.setOnClickListener {
+            index++
+            bindViews()
+        }
 
-        val textViewQuestion: TextView = findViewById(R.id.textViewQuestion)
-        val radioGroupOptions: RadioGroup = findViewById(R.id.radioGroupOptions)
-        val radioButtonOption1: RadioButton = findViewById(R.id.radioButtonOption1)
-        val radioButtonOption2: RadioButton = findViewById(R.id.radioButtonOption2)
-        val radioButtonOption3: RadioButton = findViewById(R.id.radioButtonOption3)
-        val radioButtonOption4: RadioButton = findViewById(R.id.radioButtonOption4)
-        val nextButton: Button = findViewById(R.id.nextButton)
+        btnSubmit.setOnClickListener {
+            Log.d("FINALQUIZ", questions.toString())
 
-        // Update UI to display the question and options
-        textViewQuestion.text = question.description
-        radioButtonOption1.text = question.option1
-        radioButtonOption2.text = question.option2
-        radioButtonOption3.text = question.option3
-        radioButtonOption4.text = question.option4
-
-        // Clear any previous selection in RadioGroup
-        radioGroupOptions.clearCheck()
-
-        // Set OnClickListener for the "Next" button
-        nextButton.setOnClickListener {
-            if (currentQuestionIndex < quiz.questions.size - 1) {
-                currentQuestionIndex++
-                showQuestion(currentQuestionIndex)
-            } else {
-                handleQuizCompletion()
-            }
+            val intent = Intent(this, ResultActivity::class.java)
+            val json = Gson().toJson(quizzes!![0])
+            intent.putExtra("QUIZ", json)
+            startActivity(intent)
         }
     }
 
+    private fun setUpFirestore() {
+        val firestore = FirebaseFirestore.getInstance()
+        val quizTitle = intent.getStringExtra("Title")
+        if (quizTitle != null) {
+            firestore.collection("quizzes").whereEqualTo("title", quizTitle)
+                .get()
+                .addOnSuccessListener {
+                    if (it != null && !it.isEmpty) {
+                        quizzes = it.toObjects(Quiz::class.java)
+                        questions = quizzes!![0].questions
+                        bindViews()
+                    }
+                }
+        }
+    }
 
-    private fun handleQuizCompletion() {
-        // Handle the submission or completion logic
-        // Calculate the score based on user responses
-        // You may want to show a summary or navigate to a result screen
+    private fun bindViews() {
+        val btnPrevious = findViewById<Button>(R.id.btnPrevious)
+        val btnNext = findViewById<Button>(R.id.btnNext)
+        val btnSubmit = findViewById<Button>(R.id.btnSubmit)
+        btnPrevious.visibility = View.GONE
+        btnSubmit.visibility = View.GONE
+        btnNext.visibility = View.GONE
+
+        if (index == 1) { //first question
+            btnNext.visibility = View.VISIBLE
+        } else if (index == questions!!.size) { // last question
+            btnSubmit.visibility = View.VISIBLE
+            btnPrevious.visibility = View.VISIBLE
+        } else { // Middle
+            btnPrevious.visibility = View.VISIBLE
+            btnNext.visibility = View.VISIBLE
+        }
+        val question = questions!!["question$index"]
+        val description = findViewById<TextView>(R.id.description)
+        val optionList = findViewById<RecyclerView>(R.id.optionList)
+        question?.let {
+            description.text = it.description
+            val optionAdapter = OptionAdapter(this, it)
+            optionList.layoutManager = LinearLayoutManager(this)
+            optionList.adapter = optionAdapter
+            optionList.setHasFixedSize(true)
+        }
     }
 }
