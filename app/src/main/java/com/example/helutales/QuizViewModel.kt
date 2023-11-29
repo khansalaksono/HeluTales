@@ -17,8 +17,8 @@ class QuizViewModel : ViewModel() {
                 val quizList = mutableListOf<Quiz>()
                 for (document in result) {
                     val title = document.getString("title") ?: ""
-                    val questions = document.data["questions"] as? List<Map<String, Any>> ?: emptyList()
-                    val questionList = questions.map { question ->
+                    val questionsMap = document.data["questions"] as? Map<String, Map<String, Any>> ?: mutableMapOf()
+                    val questionList = questionsMap.map { (key, question) ->
                         Question(
                             question["description"].toString(),
                             question["answer"].toString(),
@@ -26,10 +26,11 @@ class QuizViewModel : ViewModel() {
                             question["option2"].toString(),
                             question["option3"].toString(),
                             question["option4"].toString(),
-                            question["explanation"].toString()
-                        )
+                            question["explanation"].toString(),
+                            question["userAnswer"].toString()
+                        ).apply { /* Set the map key as the question ID or any unique identifier */ }
                     }
-                    val quiz = Quiz(title, questionList)
+                    val quiz = Quiz(title, questionsMap)
                     quizList.add(quiz)
                 }
                 quizzes.value = quizList
