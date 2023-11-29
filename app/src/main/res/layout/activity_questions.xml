@@ -57,4 +57,12 @@
         android:layout_below="@id/radioGroupOptions"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="16dp"/>
+
+    <TextView
+        android:id="@+id/textViewExplanation"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text=""
+        android:layout_below="@id/nextButton"
+        android:layout_marginTop="16dp"/>
 </RelativeLayout>

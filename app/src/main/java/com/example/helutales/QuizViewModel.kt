@@ -17,19 +17,9 @@ class QuizViewModel : ViewModel() {
                 val quizList = mutableListOf<Quiz>()
                 for (document in result) {
                     val title = document.getString("title") ?: ""
-                    val questions = document.data["questions"] as? List<Map<String, Any>> ?: emptyList()
-                    val questionList = questions.map { question ->
-                        Question(
-                            question["description"].toString(),
-                            question["answer"].toString(),
-                            question["option1"].toString(),
-                            question["option2"].toString(),
-                            question["option3"].toString(),
-                            question["option4"].toString(),
-                            question["explanation"].toString()
-                        )
-                    }
-                    val quiz = Quiz(title, questionList)
+                    val questionsMap = document.data["questions"] as? Map<String, Any> ?: emptyMap()
+                    val questions = parseQuestions(questionsMap)
+                    val quiz = Quiz(title, questions)
                     quizList.add(quiz)
                 }
                 quizzes.value = quizList
@@ -39,5 +29,24 @@ class QuizViewModel : ViewModel() {
             }
 
         return quizzes
+    }
+
+    private fun parseQuestions(questionsMap: Map<*, *>): MutableMap<String, Question> {
+        val result = mutableMapOf<String, Question>()
+        for ((key, value) in questionsMap) {
+            if (value is Map<*, *>) {
+                val question = Question(
+                    value["description"] as? String ?: "",
+                    value["answer"] as? String ?: "",
+                    value["option1"] as? String ?: "",
+                    value["option2"] as? String ?: "",
+                    value["option3"] as? String ?: "",
+                    value["option4"] as? String ?: "",
+                    value["explanation"] as? String ?: ""
+                )
+                result[key.toString()] = question
+            }
+        }
+        return result
     }
 }
