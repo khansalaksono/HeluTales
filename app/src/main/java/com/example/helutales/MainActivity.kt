@@ -24,7 +24,9 @@ class MainActivity : AppCompatActivity() {
             // For simplicity, let's assume you have a RecyclerView in your layout
             val recyclerView: RecyclerView = findViewById(R.id.recyclerView)
             recyclerView.layoutManager = LinearLayoutManager(this)
-            recyclerView.adapter = QuizAdapter(quizzes)
+
+            // Pass the context and quizzes to the adapter
+            recyclerView.adapter = QuizAdapter(this, quizzes)
         })
     }
 }
