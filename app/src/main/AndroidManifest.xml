@@ -23,8 +23,11 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".QuestionsActivity" />
-        <activity android:name=".ResultActivity" />
+        <activity android:name=".QuestionsActivity"
+            android:theme="@style/Theme.HeluTalesNoActionBar"/>
+
+        <activity android:name=".ResultActivity"
+            android:theme="@style/Theme.HeluTalesNoActionBar" />
     </application>
 
 </manifest>
