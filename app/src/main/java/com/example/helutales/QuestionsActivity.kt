@@ -20,6 +20,11 @@ class QuestionsActivity : AppCompatActivity() {
     var questions: MutableMap<String, Question>? = null
     var index = 1
     private lateinit var quizTitle: String
+    private var showingQuestion = true
+    private var selectedOption: String? = null
+    private var selectedOptionBefore: String? = null
+    private lateinit var optionAdapter: OptionAdapter
+    private lateinit var description: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -126,9 +131,53 @@ class QuestionsActivity : AppCompatActivity() {
 //    }
 
     private fun bindViews() {
+//        val btnNext = findViewById<Button>(R.id.btnNext)
+//        val btnSubmit = findViewById<Button>(R.id.btnSubmit)
+//        val optionList = findViewById<RecyclerView>(R.id.optionList)
+//        val materiText = findViewById<TextView>(R.id.materiText)
+//
+//        btnSubmit.visibility = View.GONE
+//        optionList.visibility = View.GONE
+//        materiText.visibility = View.GONE
+//
+//        if (index == 1) { //first question
+//            btnNext.visibility = View.VISIBLE
+//        } else if (index == questions!!.size) { // last question
+//            if (showingQuestion) {
+//                btnNext.visibility = View.VISIBLE
+//            } else {
+//                btnNext.visibility = View.GONE
+//                btnSubmit.visibility = View.VISIBLE
+//            }
+//        } else { // Middle
+//            btnNext.visibility = View.VISIBLE
+//        }
+//
+//        val question = questions!!["question$index"]
+//
+//        question?.let {
+//            if (showingQuestion) {
+//                description.text = it.description
+//
+//                // Use the same instance of optionAdapter
+//                optionAdapter.updateQuestion(it)
+//
+//                optionList.layoutManager = LinearLayoutManager(this)
+//                optionList.adapter = optionAdapter
+//                optionList.setHasFixedSize(true)
+//                optionList.visibility = View.VISIBLE
+//                selectedOption = null
+//            } else {
+//                materiText.text = it.explanation
+//                description.visibility = View.VISIBLE
+//
+//                selectedOption = null
+//            }
+//        }
         val btnPrevious = findViewById<Button>(R.id.btnPrevious)
         val btnNext = findViewById<Button>(R.id.btnNext)
         val btnSubmit = findViewById<Button>(R.id.btnSubmit)
+
         btnPrevious.visibility = View.GONE
         btnSubmit.visibility = View.GONE
         btnNext.visibility = View.GONE
@@ -142,9 +191,12 @@ class QuestionsActivity : AppCompatActivity() {
             btnPrevious.visibility = View.VISIBLE
             btnNext.visibility = View.VISIBLE
         }
+
         val question = questions!!["question$index"]
+
         val description = findViewById<TextView>(R.id.description)
         val optionList = findViewById<RecyclerView>(R.id.optionList)
+
         question?.let {
             description.text = it.description
             val optionAdapter = OptionAdapter(this, it)

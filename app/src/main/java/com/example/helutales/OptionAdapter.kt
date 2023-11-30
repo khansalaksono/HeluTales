@@ -9,10 +9,21 @@ import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import com.example.helutales.Question
 
-class OptionAdapter(val context: Context, val question: Question) :
+class OptionAdapter(val context: Context, var question: Question) :
     RecyclerView.Adapter<OptionAdapter.OptionViewHolder>() {
 
     private var options: List<String> = listOf(question.option1, question.option2, question.option3, question.option4)
+    private var selectedOption: String? = null
+
+    fun getSelectedOption(): String? {
+        return selectedOption
+    }
+
+    fun updateQuestion(newQuestion: Question) {
+        question = newQuestion
+        options = listOf(newQuestion.option1, newQuestion.option2, newQuestion.option3, newQuestion.option4)
+        notifyDataSetChanged()
+    }
 
     inner class OptionViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView){
         var optionView = itemView.findViewById<TextView>(R.id.quiz_option)
