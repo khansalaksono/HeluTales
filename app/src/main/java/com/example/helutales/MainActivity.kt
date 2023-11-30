@@ -1,13 +1,18 @@
 package com.example.helutales
 
+import com.example.helutales.R
 import QuizViewModel
+import android.content.DialogInterface
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.View
+import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.floatingactionbutton.FloatingActionButton
+
 
 class MainActivity : AppCompatActivity(), QuizAdapter.OnItemClickListener {
 
@@ -31,6 +36,13 @@ class MainActivity : AppCompatActivity(), QuizAdapter.OnItemClickListener {
             val quizAdapter = QuizAdapter(this, quizzes, this)
             recyclerView.adapter = quizAdapter
         })
+
+        val fab: FloatingActionButton = findViewById(R.id.fab)
+        fab.setOnClickListener {
+            // Handle the click event, e.g., redirecting to the Pomodoro activity
+            val intent = Intent(this@MainActivity, PomodoroActivity::class.java)
+            startActivity(intent)
+        }
     }
 
     override fun onItemClick(quiz: Quiz, position: Int) {
