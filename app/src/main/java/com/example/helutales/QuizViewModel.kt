@@ -1,52 +1,33 @@
-package com.example.helutales
-
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.google.firebase.firestore.FirebaseFirestore
+import com.example.helutales.Quiz
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 class QuizViewModel : ViewModel() {
-    private val firestore = FirebaseFirestore.getInstance()
-    private val quizzes = MutableLiveData<List<Quiz>>()
 
-    fun getQuizzes(): LiveData<List<Quiz>> {
-        // Fetch data from Firestore and update the LiveData
-        firestore.collection("quizzes")
-            .get()
-            .addOnSuccessListener { result ->
-                val quizList = mutableListOf<Quiz>()
-                for (document in result) {
-                    val title = document.getString("title") ?: ""
-                    val questionsMap = document.data["questions"] as? Map<String, Any> ?: emptyMap()
-                    val questions = parseQuestions(questionsMap)
-                    val quiz = Quiz(title, questions)
-                    quizList.add(quiz)
-                }
-                quizzes.value = quizList
-            }
-            .addOnFailureListener { exception ->
-                // Handle errors
-            }
+    private val quizRepository: QuizRepository = QuizRepository()
 
-        return quizzes
+    // LiveData to observe changes in the quiz list
+    private val _quizzes = MutableLiveData<List<Quiz>>()
+    val quizzes: LiveData<List<Quiz>> get() = _quizzes
+
+    init {
+        // Initialize the ViewModel by loading quizzes from the repository
+        loadQuizzes()
     }
 
-    private fun parseQuestions(questionsMap: Map<*, *>): MutableMap<String, Question> {
-        val result = mutableMapOf<String, Question>()
-        for ((key, value) in questionsMap) {
-            if (value is Map<*, *>) {
-                val question = Question(
-                    value["description"] as? String ?: "",
-                    value["answer"] as? String ?: "",
-                    value["option1"] as? String ?: "",
-                    value["option2"] as? String ?: "",
-                    value["option3"] as? String ?: "",
-                    value["option4"] as? String ?: "",
-                    value["explanation"] as? String ?: ""
-                )
-                result[key.toString()] = question
+    private fun loadQuizzes() {
+        // Use a coroutine scope to call the suspend function
+        GlobalScope.launch(Dispatchers.Main) {
+            try {
+                _quizzes.value = quizRepository.getQuizzes()
+            } catch (e: Exception) {
+                // Handle the exception appropriately (e.g., log or show an error message)
+                e.printStackTrace()
             }
         }
-        return result
     }
 }

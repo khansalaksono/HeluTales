@@ -1,123 +1,216 @@
 package com.example.helutales
 
+import android.content.Intent
 import android.os.Bundle
+import android.util.Log
+import android.view.View
 import android.widget.Button
-import android.widget.RadioButton
-import android.widget.RadioGroup
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.gson.Gson
 
 class QuestionsActivity : AppCompatActivity() {
 
-    private var currentQuestionIndex: Int = 0
-    private val sharedViewModel = ViewModelProvider(this).get(SharedViewModel::class.java)
-    private lateinit var quiz: Quiz // Use lateinit to initialize it later
+    //var quizzes: MutableList<Quiz>? = null
+    private var quiz: Quiz? = null
+    var questions: MutableMap<String, Question>? = null
+    var index = 1
+    private lateinit var quizTitle: String
+    private var showingQuestion = true
+    private var selectedOption: String? = null
+    private var selectedOptionBefore: String? = null
+    private lateinit var optionAdapter: OptionAdapter
+    private lateinit var description: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_questions)
+        setContentView(R.layout.activity_question)
 
-        quiz = sharedViewModel.selectedQuiz!! // Initialize the quiz variable
+        quizTitle = intent.getStringExtra("Title") ?: ""
 
-        showQuestion(currentQuestionIndex)
-
-        val nextButton: Button = findViewById(R.id.nextButton)
-        nextButton.setOnClickListener {
-            if (currentQuestionIndex < quiz.questions.size - 1) {
-                currentQuestionIndex++
-                showQuestion(currentQuestionIndex)
-            } else {
-                handleQuizCompletion()
-            }
-        }
+        setUpFirestore()
+        setUpEventListener()
     }
 
-    private fun showQuestion(index: Int) {
-        if (quiz.questions.isEmpty() || index >= quiz.questions.size) {
-            return
+    private fun setUpEventListener() {
+        val btnPrevious = findViewById<Button>(R.id.btnPrevious)
+        val btnNext = findViewById<Button>(R.id.btnNext)
+        val btnSubmit = findViewById<Button>(R.id.btnSubmit)
+        btnPrevious.setOnClickListener {
+            index--
+            bindViews()
         }
 
-        val questionKeys = quiz.questions.keys.toList()
-        val currentQuestionKey = questionKeys[index]
-        val currentQuestion = quiz.questions[currentQuestionKey] as? Map<String, Any>
+        btnNext.setOnClickListener {
+            index++
+            bindViews()
+        }
 
-//        val currentQuestion = quiz.questions[currentQuestionKey]
+        btnSubmit.setOnClickListener {
+            if (quiz != null) {
+                Log.d("FINALQUIZ", questions.toString())
 
-        val textViewQuestion: TextView = findViewById(R.id.textViewQuestion)
-        val radioGroupOptions: RadioGroup = findViewById(R.id.radioGroupOptions)
-        val radioButtonOption1: RadioButton = findViewById(R.id.radioButtonOption1)
-        val radioButtonOption2: RadioButton = findViewById(R.id.radioButtonOption2)
-        val radioButtonOption3: RadioButton = findViewById(R.id.radioButtonOption3)
-        val radioButtonOption4: RadioButton = findViewById(R.id.radioButtonOption4)
-
-        textViewQuestion.text = currentQuestion?.get("description") as? String ?: ""
-        radioButtonOption1.text = currentQuestion?.get("option1") as? String ?: ""
-        radioButtonOption2.text = currentQuestion?.get("option2") as? String ?: ""
-        radioButtonOption3.text = currentQuestion?.get("option3") as? String ?: ""
-        radioButtonOption4.text = currentQuestion?.get("option4") as? String ?: ""
-
-
-//        textViewQuestion.text = currentQuestion?.description ?: ""
-//        radioButtonOption1.text = currentQuestion?.option1 ?: ""
-//        radioButtonOption2.text = currentQuestion?.option2 ?: ""
-//        radioButtonOption3.text = currentQuestion?.option3 ?: ""
-//        radioButtonOption4.text = currentQuestion?.option4 ?: ""
-
-        radioGroupOptions.clearCheck()
-
-        val nextButton: Button = findViewById(R.id.nextButton)
-        nextButton.setOnClickListener {
-            if (index < quiz.questions.size - 1) {
-                showQuestion(index + 1)
+                val intent = Intent(this, ResultActivity::class.java)
+                val json = Gson().toJson(quiz)
+                intent.putExtra("QUIZ", json)
+                startActivity(intent)
             } else {
-                showExplanationForLastQuestion()
+                // Handle the case where quiz is null
+                Toast.makeText(this, "No quiz available", Toast.LENGTH_SHORT).show()
             }
         }
-    }
 
-    private fun showExplanationForLastQuestion() {
-//        val textViewExplanation: TextView = findViewById(R.id.textViewExplanation)
-//        val lastQuestionExplanation = quiz.questions.values.lastOrNull()?.explanation
+
+//        btnSubmit.setOnClickListener {
+//            if (quizzes != null && quizzes!!.isNotEmpty()) {
+//                Log.d("FINALQUIZ", questions.toString())
 //
-//        if (lastQuestionExplanation != null) {
-//            textViewExplanation.text = lastQuestionExplanation
-//        } else {
-//            textViewExplanation.text = "Explanation not available"
+//                val intent = Intent(this, ResultActivity::class.java)
+//                val json = Gson().toJson(quizzes!![0])
+//                intent.putExtra("QUIZ", json)
+//                startActivity(intent)
+//            } else {
+//                // Handle the case where quizzes is null or empty
+//                Toast.makeText(this, "No quizzes available", Toast.LENGTH_SHORT).show()
+//            }
+//        }
+    }
+
+    private fun setUpFirestore() {
+        val firestore = FirebaseFirestore.getInstance()
+
+        if (quizTitle.isNotEmpty()) {
+            firestore.collection("quizzes").whereEqualTo("title", quizTitle)
+                .get()
+                .addOnSuccessListener { result ->
+                    if (result != null && !result.isEmpty) {
+                        val document = result.documents[0]
+                        quiz = document.toObject(Quiz::class.java)
+
+                        if (quiz != null) {
+                            questions = quiz?.questions?.toMutableMap()
+                            bindViews()
+                        } else {
+                            // Handle the case where the retrieved quiz is null
+                            Toast.makeText(this, "No quiz available", Toast.LENGTH_SHORT).show()
+                        }
+                    } else {
+                        // Handle the case where no quiz is found
+                        Toast.makeText(this, "No quiz found", Toast.LENGTH_SHORT).show()
+                    }
+                }
+                .addOnFailureListener { exception ->
+                    // Handle the failure to retrieve data from Firestore
+                    Log.e("QuestionsActivity", "Error getting quiz questions", exception)
+                    Toast.makeText(this, "Error retrieving quiz", Toast.LENGTH_SHORT).show()
+                }
+        }
+    }
+
+
+
+//    private fun setUpFirestore() {
+//        val firestore = FirebaseFirestore.getInstance()
+//        val quizTitle = intent.getStringExtra("Title")
+//        if (quizTitle != null) {
+//            firestore.collection("quizzes").whereEqualTo("title", quizTitle)
+//                .get()
+//                .addOnSuccessListener { result ->
+//                    if (result != null && !result.isEmpty) {
+//                        val document = result.documents[0]
+//                        val quiz = document.toObject(Quiz::class.java)
+//                        questions = quiz?.questions?.toMutableMap()
+//                        bindViews()
+//                    }
+//                }
+//        }
+//    }
+
+    private fun bindViews() {
+//        val btnNext = findViewById<Button>(R.id.btnNext)
+//        val btnSubmit = findViewById<Button>(R.id.btnSubmit)
+//        val optionList = findViewById<RecyclerView>(R.id.optionList)
+//        val materiText = findViewById<TextView>(R.id.materiText)
+//
+//        btnSubmit.visibility = View.GONE
+//        optionList.visibility = View.GONE
+//        materiText.visibility = View.GONE
+//
+//        if (index == 1) { //first question
+//            btnNext.visibility = View.VISIBLE
+//        } else if (index == questions!!.size) { // last question
+//            if (showingQuestion) {
+//                btnNext.visibility = View.VISIBLE
+//            } else {
+//                btnNext.visibility = View.GONE
+//                btnSubmit.visibility = View.VISIBLE
+//            }
+//        } else { // Middle
+//            btnNext.visibility = View.VISIBLE
 //        }
 //
-//        val nextButton: Button = findViewById(R.id.nextButton)
-//        nextButton.text = "Submit"
+//        val question = questions!!["question$index"]
 //
-//        nextButton.setOnClickListener {
-//            handleQuizCompletion()
+//        question?.let {
+//            if (showingQuestion) {
+//                description.text = it.description
+//
+//                // Use the same instance of optionAdapter
+//                optionAdapter.updateQuestion(it)
+//
+//                optionList.layoutManager = LinearLayoutManager(this)
+//                optionList.adapter = optionAdapter
+//                optionList.setHasFixedSize(true)
+//                optionList.visibility = View.VISIBLE
+//                selectedOption = null
+//            } else {
+//                materiText.text = it.explanation
+//                description.visibility = View.VISIBLE
+//
+//                selectedOption = null
+//            }
 //        }
+        val btnPrevious = findViewById<Button>(R.id.btnPrevious)
+        val btnNext = findViewById<Button>(R.id.btnNext)
+        val btnSubmit = findViewById<Button>(R.id.btnSubmit)
 
-        fun showExplanationForLastQuestion() {
-            val textViewExplanation: TextView = findViewById(R.id.textViewExplanation)
+        btnPrevious.visibility = View.GONE
+        btnSubmit.visibility = View.GONE
+        btnNext.visibility = View.GONE
 
-            val lastQuestion = quiz.questions.values.lastOrNull() as? Map<String, Any>
+        if (index == 1) { //first question
+            btnNext.visibility = View.VISIBLE
+        } else if (index == questions!!.size) { // last question
+            btnSubmit.visibility = View.VISIBLE
+            btnPrevious.visibility = View.VISIBLE
+        } else { // Middle
+            btnPrevious.visibility = View.VISIBLE
+            btnNext.visibility = View.VISIBLE
+        }
 
-            val lastQuestionExplanation = lastQuestion?.get("explanation") as? String
+        val question = questions!!["question$index"]
 
-            if (lastQuestionExplanation != null) {
-                textViewExplanation.text = lastQuestionExplanation
-            } else {
-                textViewExplanation.text = "Explanation not available"
-            }
+        val description = findViewById<TextView>(R.id.description)
+        val optionList = findViewById<RecyclerView>(R.id.optionList)
 
-            val nextButton: Button = findViewById(R.id.nextButton)
-            nextButton.text = "Submit"
-
-            nextButton.setOnClickListener {
-                handleQuizCompletion()
-            }
+        question?.let {
+            description.text = it.description
+            val optionAdapter = OptionAdapter(this, it)
+            optionList.layoutManager = LinearLayoutManager(this)
+            optionList.adapter = optionAdapter
+            optionList.setHasFixedSize(true)
         }
     }
 
-    private fun handleQuizCompletion() {
-        // Handle the submission or completion logic
-        // Calculate the score based on user responses
-        // You may want to show a summary or navigate to a result screen
+    override fun onBackPressed() {
+        super.onBackPressed()
+        // Pass the quiz title back to MainActivity
+        val intent = Intent(this, MainActivity::class.java)
+        intent.putExtra("Title", quizTitle)
+        startActivity(intent)
     }
 }
