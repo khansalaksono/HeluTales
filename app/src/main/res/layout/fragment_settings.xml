@@ -1,0 +1,60 @@
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/workDurationLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Work Duration"
+        android:layout_marginTop="16dp"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"/>
+
+    <SeekBar
+        android:id="@+id/workDurationSeekBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:max="120"
+        android:progress="25"
+        android:layout_below="@id/workDurationLabel"
+        android:layout_marginTop="8dp"/>
+
+    <TextView
+        android:id="@+id/breakDurationLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Break Duration"
+        android:layout_below="@+id/workDurationSeekBar"
+        android:layout_marginTop="16dp"
+        android:layout_centerHorizontal="true"/>
+
+    <SeekBar
+        android:id="@+id/breakDurationSeekBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:max="120"
+        android:progress="5"
+        android:layout_below="@id/breakDurationLabel"
+        android:layout_marginTop="8dp"/>
+
+    <TextView
+        android:id="@+id/workCyclesLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Work Cycles"
+        android:layout_below="@+id/breakDurationSeekBar"
+        android:layout_marginTop="16dp"
+        android:layout_centerHorizontal="true"/>
+
+    <SeekBar
+        android:id="@+id/workCyclesSeekBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:max="50"
+        android:progress="1"
+        android:layout_below="@id/workCyclesLabel"
+        android:layout_marginTop="8dp"/>
+
+</RelativeLayout>
