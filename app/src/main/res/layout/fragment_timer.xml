@@ -1,26 +1,66 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
+<!-- fragment_timer.xml -->
 
-    <ProgressBar
-        android:id="@+id/timerProgressBar"
-        style="?android:attr/progressBarStyleHorizontal"
-        android:layout_width="180dp"
-        android:layout_height="180dp"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <EditText
+        android:id="@+id/taskNameEditText"
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="100dp"
+        android:hint="Task Name"
+        android:minHeight="48dp"
+        android:textAlignment="center"
+        tools:ignore="HardcodedText" />
+
+    <Button
+        android:id="@+id/saveTask"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/taskNameEditText"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="16dp"
-        android:max="100"
-        android:progress="100"
-        android:progressDrawable="@drawable/circular_progress_bar"/>
+        android:contentDescription="Start Task Button"
+        android:hint="Start Task"
+        tools:ignore="ContentDescription,HardcodedText,RedundantDescriptionCheck" />
+
+    <TextView
+        android:id="@+id/workCyclesLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/taskNameEditText"
+        android:textSize="28sp"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="25dp"
+        android:contentDescription="Work Cycles Label"
+        tools:ignore="ContentDescription,HardcodedText,RedundantDescriptionCheck" />
+
+<!--    <ProgressBar-->
+<!--        android:id="@+id/timerProgressBar"-->
+<!--        style="?android:attr/progressBarStyleHorizontal"-->
+<!--        android:layout_width="180dp"-->
+<!--        android:layout_height="180dp"-->
+<!--        android:layout_centerHorizontal="true"-->
+<!--        android:layout_below="@id/saveTask"-->
+<!--        android:layout_marginTop="66dp"-->
+<!--        android:max="100"-->
+<!--        android:progress="100"-->
+<!--        android:progressDrawable="@drawable/circular_progress_bar" />-->
 
     <ImageView
         android:id="@+id/appLogoImageView"
         android:layout_width="120dp"
         android:layout_height="120dp"
-        android:src="@drawable/ic_app_timer"
+        android:layout_below="@id/saveTask"
         android:layout_centerHorizontal="true"
-        android:layout_below="@id/timerProgressBar"
-        android:layout_marginTop="8dp"/>
+        android:layout_marginTop="94dp"
+        android:contentDescription="Bhavana Timer Logo"
+        android:src="@drawable/ic_app_timer"
+        tools:ignore="HardcodedText,ImageContrastCheck" />
 
     <TextView
         android:id="@+id/timerTextView"
@@ -29,46 +69,62 @@
         android:text="00:00"
         android:textSize="28sp"
         android:layout_centerHorizontal="true"
-        android:layout_below="@id/appLogoImageView"
-        android:layout_marginTop="8dp"/>
+        android:layout_below="@id/saveTask"
+        android:layout_marginTop="136dp"
+        tools:ignore="HardcodedText" />
 
-    <EditText
-        android:id="@+id/taskNameEditText"
+    <LinearLayout
+        android:id="@+id/linearLayout3"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Task Name"
-        android:layout_below="@id/timerTextView"
-        android:layout_marginTop="16dp"
-        android:layout_centerHorizontal="true"/>
+        android:orientation="horizontal"
+        android:layout_below="@id/appLogoImageView"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="16dp">
 
-    <ImageButton
-        android:id="@+id/startButton"
+        <ImageButton
+            android:id="@+id/startButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_gravity="center"
+            android:background="?android:attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Start Work Button"
+            android:src="@drawable/ic_play"
+            tools:ignore="HardcodedText,RedundantDescriptionCheck" />
+
+        <ImageButton
+            android:id="@+id/pauseButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_gravity="center"
+            android:background="?android:attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Pause Button"
+            android:src="@drawable/ic_pause"
+            tools:ignore="HardcodedText,RedundantDescriptionCheck" />
+
+        <ImageButton
+            android:id="@+id/stopButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_gravity="center"
+            android:background="?android:attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Stop Work Button"
+            android:src="@drawable/ic_stop"
+            tools:ignore="HardcodedText,RedundantDescriptionCheck,UnknownId" />
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/endTask"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/ic_play"
-        android:background="?android:attr/selectableItemBackgroundBorderless"
-        android:layout_below="@id/timerProgressBar"
-        android:layout_marginTop="16dp"
-        android:layout_centerHorizontal="true"/>
-
-    <ImageButton
-        android:id="@+id/stopButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/ic_stop"
-        android:background="?android:attr/selectableItemBackgroundBorderless"
-        android:layout_below="@id/timerProgressBar"
-        android:layout_marginTop="16dp"
-        android:layout_toEndOf="@id/startButton"/>
-
-    <ImageButton
-        android:id="@+id/replayButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/ic_replay"
-        android:background="?android:attr/selectableItemBackgroundBorderless"
-        android:layout_below="@id/timerProgressBar"
-        android:layout_marginTop="16dp"
-        android:layout_toStartOf="@id/startButton"/>
+        android:layout_below="@id/linearLayout3"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="100dp"
+        android:contentDescription="End Task Button"
+        android:hint="End Task"
+        tools:ignore="ContentDescription,HardcodedText,RedundantDescriptionCheck" />
 
 </RelativeLayout>
