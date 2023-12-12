@@ -35,9 +35,45 @@
         android:layout_below="@id/taskNameEditText"
         android:textSize="28sp"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="25dp"
+        android:layout_marginTop="10dp"
         android:contentDescription="Work Cycles Label"
         tools:ignore="ContentDescription,HardcodedText,RedundantDescriptionCheck" />
+
+
+        <LinearLayout
+            android:id="@+id/labelsLayout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/workCyclesLabel"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="10dp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/workPhaseLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="20sp"
+                android:contentDescription="Work Phase Label"
+                tools:ignore="ContentDescription,HardcodedText,RedundantDescriptionCheck" />
+
+            <TextView
+                android:id="@+id/breakPhaseLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="20sp"
+                android:contentDescription="Break Phase Label"
+                tools:ignore="ContentDescription,HardcodedText,RedundantDescriptionCheck" />
+
+            <TextView
+                android:id="@+id/longBreakLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="20sp"
+                android:contentDescription="Long Break Label"
+                tools:ignore="ContentDescription,HardcodedText,RedundantDescriptionCheck" />
+
+        </LinearLayout>
 
 <!--    <ProgressBar-->
 <!--        android:id="@+id/timerProgressBar"-->
@@ -55,7 +91,7 @@
         android:id="@+id/appLogoImageView"
         android:layout_width="120dp"
         android:layout_height="120dp"
-        android:layout_below="@id/saveTask"
+        android:layout_below="@id/labelsLayout"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="94dp"
         android:contentDescription="Bhavana Timer Logo"
@@ -69,7 +105,7 @@
         android:text="00:00"
         android:textSize="28sp"
         android:layout_centerHorizontal="true"
-        android:layout_below="@id/saveTask"
+        android:layout_below="@id/labelsLayout"
         android:layout_marginTop="136dp"
         tools:ignore="HardcodedText" />
 

@@ -28,7 +28,5 @@ class PomodoroActivity : AppCompatActivity() {
 
         // Connect the ViewPager to the TabLayout
         tabLayout.setupWithViewPager(viewPager)
-
-
     }
 }

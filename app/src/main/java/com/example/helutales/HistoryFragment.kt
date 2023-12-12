@@ -50,4 +50,6 @@ class HistoryFragment : Fragment(), OnTaskDataChangeListener {
     override fun onTaskDataChanged() {
         loadTasks()
     }
+
+
 }

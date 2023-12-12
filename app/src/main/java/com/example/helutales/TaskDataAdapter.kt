@@ -1,5 +1,7 @@
 package com.example.helutales
 
+import android.app.AlertDialog
+import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -29,8 +31,24 @@ class TaskDataAdapter : ListAdapter<TaskData, TaskDataAdapter.TaskViewHolder>(Ta
         holder.workCyclesTextView.text = "Work Cycles: ${currentTask.workCycles}"
         holder.deleteButton.setOnClickListener {
             // Panggil metode untuk menghapus tugas di sini
-            TaskDataManager.removeTask(holder.itemView.context, currentTask)
+            showDeleteConfirmationDialog(holder.itemView.context, currentTask)
         }
+    }
+
+    private fun showDeleteConfirmationDialog(context: Context, taskData: TaskData) {
+        val builder = AlertDialog.Builder(context)
+        builder.setTitle("Confirmation")
+            .setMessage("Are you sure you want to delete ${taskData.taskName}?")
+            .setPositiveButton("Yes") { _, _ ->
+                // Panggil metode untuk menghapus tugas di sini
+                TaskDataManager.removeTask(context, taskData)
+            }
+            .setNegativeButton("No") { dialog, _ ->
+                dialog.dismiss()
+            }
+
+        val dialog: AlertDialog = builder.create()
+        dialog.show()
     }
 }
 

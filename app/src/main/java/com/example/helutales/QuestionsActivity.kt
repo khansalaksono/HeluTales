@@ -1,5 +1,6 @@
 package com.example.helutales
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -7,6 +8,7 @@ import android.view.View
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -34,6 +36,28 @@ class QuestionsActivity : AppCompatActivity() {
 
         setUpFirestore()
         setUpEventListener()
+    }
+
+    @SuppressLint("MissingSuperCall")
+    override fun onBackPressed() {
+        showExitConfirmationDialog()
+    }
+
+    private fun showExitConfirmationDialog() {
+        val builder = AlertDialog.Builder(this)
+        builder.setTitle("Exit Quiz")
+            .setMessage("Are you sure you want to exit the quiz? Your progress will be lost.")
+            .setPositiveButton("Yes") { _, _ ->
+                // User clicked "Yes," exit the quiz
+                super.onBackPressed()
+            }
+            .setNegativeButton("No") { dialog, _ ->
+                // User clicked "No," dismiss the dialog
+                dialog.dismiss()
+            }
+
+        val dialog: AlertDialog = builder.create()
+        dialog.show()
     }
 
     private fun setUpEventListener() {
@@ -206,11 +230,11 @@ class QuestionsActivity : AppCompatActivity() {
         }
     }
 
-    override fun onBackPressed() {
-        super.onBackPressed()
-        // Pass the quiz title back to MainActivity
-        val intent = Intent(this, MainActivity::class.java)
-        intent.putExtra("Title", quizTitle)
-        startActivity(intent)
-    }
+//    override fun onBackPressed() {
+//        super.onBackPressed()
+//        // Pass the quiz title back to MainActivity
+//        val intent = Intent(this, MainActivity::class.java)
+//        intent.putExtra("Title", quizTitle)
+//        startActivity(intent)
+//    }
 }

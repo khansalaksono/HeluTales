@@ -1,5 +1,6 @@
 package com.example.helutales
 
+import android.app.AlertDialog
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.view.LayoutInflater
@@ -25,6 +26,10 @@ class TimerFragment : Fragment() {
     private lateinit var timerTextView: TextView
     private lateinit var endTaskButton: Button
 
+    private lateinit var workPhaseLabel: TextView
+    private lateinit var breakPhaseLabel: TextView
+    private lateinit var longBreakLabel: TextView
+
     private var isWorking = false
     private var workCycleCount = 0
     private lateinit var countDownTimer: CountDownTimer
@@ -33,6 +38,11 @@ class TimerFragment : Fragment() {
     private var remainingMillis: Long = 0
 //    private var savedProgress = 100 // Declare savedProgress here
     private var initialDuration: Long = 0 // tambahkan properti untuk menyimpan durasi semula
+
+    private var phaseCount = 0
+    private var workPhaseCount = 0
+    private var breakPhaseCount = 0
+    private var longBreakCount = 0
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -50,9 +60,14 @@ class TimerFragment : Fragment() {
         timerTextView = view.findViewById(R.id.timerTextView)
         endTaskButton = view.findViewById(R.id.endTask)
 
+        workPhaseLabel = view.findViewById(R.id.workPhaseLabel)
+        breakPhaseLabel = view.findViewById(R.id.breakPhaseLabel)
+        longBreakLabel = view.findViewById(R.id.longBreakLabel)
+
         pauseButton.visibility = View.GONE
         startButton.visibility = View.GONE
         stopButton.visibility = View.GONE
+        endTaskButton.visibility = View.GONE
 
         saveTaskButton.setOnClickListener {
             handleSaveTask()
@@ -80,12 +95,12 @@ class TimerFragment : Fragment() {
             startButton.visibility = View.VISIBLE
         }
 
-        stopButton.setOnClickListener {
-            stopTimer()
-        }
+//        stopButton.setOnClickListener {
+//            stopTimer()
+//        }
 
         endTaskButton.setOnClickListener {
-            endTask()
+            showConfirmationDialog()
         }
 
         return view
@@ -96,43 +111,79 @@ class TimerFragment : Fragment() {
         if (taskName.isNotEmpty()) {
             saveTaskButton.visibility = View.GONE
             workCyclesLabel.visibility = View.VISIBLE
+            workPhaseLabel.visibility = View.VISIBLE
+            breakPhaseLabel.visibility = View.VISIBLE
+            longBreakLabel.visibility = View.VISIBLE
             startWorkCycle()
         }
     }
 
     private fun startWorkCycle() {
-        if (workCycleCount % 8 == 0) {
-            // Sudah melewati 4 tahap kerja dan 4 tahap istirahat, reset workCycleCount
-            workCycleCount = 0
-        }
-
         isWorking = true
         isPaused = false
-        workCycleCount++
+        phaseCount++
         updateWorkCycleLabel()
 
-        // Set the timer based on work or break duration
-        val duration = if (workCycleCount % 2 == 1) {
-            if (workCycleCount <= 7) 1 * 60 * 1000 else 15 * 60 * 1000
-        } else {
-            5 * 60 * 1000
+        val duration = when {
+            phaseCount % 8 == 0 -> {
+                // Long Break
+                longBreakLabel.text = "Long Break"
+                workPhaseLabel.text = ""
+                breakPhaseLabel.text = ""
+                0.3 * 60 * 1000 // Long Break: 15 menit
+            }
+            phaseCount % 2 == 1 -> {
+                // Work Phase
+                workPhaseLabel.text = "Work Phase"
+                breakPhaseLabel.text = ""
+                longBreakLabel.text = ""
+                0.1 * 60 * 1000 // Work Phase: 25 menit
+            }
+            else -> {
+                // Break Phase
+                breakPhaseLabel.text = "Break Phase"
+                workPhaseLabel.text = ""
+                longBreakLabel.text = ""
+                0.2 * 60 * 1000 // Break Phase: 5 menit
+            }
         }
 
-        // Setel initialDuration saat memulai siklus baru
         initialDuration = duration.toLong()
-
-        // Reset savedProgress to default when starting a new work cycle
-//        savedProgress = 100
 
         countDownTimer = object : CountDownTimer(duration.toLong(), 1000) {
             override fun onTick(millisUntilFinished: Long) {
                 updateTimerText(millisUntilFinished)
-//                updateProgressBar(millisUntilFinished, duration.toLong())
                 remainingMillis = millisUntilFinished
             }
 
             override fun onFinish() {
-                if (workCycleCount < 8) {
+                when {
+                    phaseCount % 8 == 0 -> {
+                        // Long Break
+                        longBreakCount++
+                        longBreakLabel.text = "Long Break"
+                    }
+                    phaseCount % 2 == 1 -> {
+                        // Work Phase
+                        workPhaseCount++
+                        workPhaseLabel.text = "Work Phase"
+                    }
+                    else -> {
+                        // Break Phase
+                        breakPhaseCount++
+                        breakPhaseLabel.text = "Break Phase"
+                    }
+                }
+
+                if (workPhaseCount == 4 && breakPhaseCount == 3 && longBreakCount == 1) {
+                    workCycleCount++
+                    workPhaseCount = 0
+                    breakPhaseCount = 0
+                    longBreakCount = 0
+                }
+
+                // Tetapkan kondisi untuk memulai siklus baru atau mengakhiri
+                if (isWorking) {
                     startWorkCycle()
                 } else {
                     // Work cycles completed, reset everything
@@ -143,7 +194,8 @@ class TimerFragment : Fragment() {
 
         pauseButton.visibility = View.GONE
         startButton.visibility = View.VISIBLE
-        stopButton.visibility = View.VISIBLE
+//        stopButton.visibility = View.VISIBLE
+        endTaskButton.visibility = View.VISIBLE
 
         countDownTimer.start()
     }
@@ -152,23 +204,30 @@ class TimerFragment : Fragment() {
         countDownTimer = object : CountDownTimer(duration, 1000) {
             override fun onTick(millisUntilFinished: Long) {
                 updateTimerText(millisUntilFinished)
-//                updateProgressBar(millisUntilFinished, duration)
                 remainingMillis = millisUntilFinished
             }
 
             override fun onFinish() {
-                if (workCycleCount < 8) {
-                    startWorkCycle()
-                } else {
-                    // Work cycles completed, reset everything
-                    resetTimer()
+                if (phaseCount % 2 == 1) {
+                    workPhaseCount++
                 }
+
+                if (phaseCount % 4 == 0) {
+                    longBreakCount++
+                } else {
+                    breakPhaseCount++
+                }
+
+//                if (workCycleCount < 8) {
+//                    startWorkCycle()
+//                } else {
+//                    // Work cycles completed, reset everything
+//                    resetTimer()
+//                }
             }
         }
 
-//        // Simpan initialDuration saat memulai timer
-//        initialDuration = duration
-
+        initialDuration = duration
         countDownTimer.start()
     }
 
@@ -220,6 +279,9 @@ class TimerFragment : Fragment() {
         workCycleCount = 0
         saveTaskButton.visibility = View.VISIBLE
         workCyclesLabel.visibility = View.GONE
+        workPhaseLabel.visibility = View.GONE
+        breakPhaseLabel.visibility = View.GONE
+        longBreakLabel.visibility = View.GONE
         timerTextView.text = "00:00"
 //        timerProgressBar.progress = 100
     }
@@ -255,7 +317,33 @@ class TimerFragment : Fragment() {
         // Simpan data ke dalam TaskDataManager
         TaskDataManager.saveTask(requireContext(), TaskData(0, taskName, cycles))
 
-        // Reset tampilan atau lakukan apa pun yang diperlukan setelah mengakhiri tugas
+        // Clear the taskNameEditText
+        taskNameEditText.text.clear()
+
+        // Cancel the countDownTimer
+        countDownTimer.cancel()
+
+        pauseButton.visibility = View.GONE
+//        stopButton.visibility = View.GONE
+        startButton.visibility = View.GONE
+        endTaskButton.visibility = View.GONE
+
         resetTimer()
+        isStopped = true
+    }
+
+    private fun showConfirmationDialog() {
+        val builder = AlertDialog.Builder(requireContext())
+        builder.setTitle("Confirmation")
+            .setMessage("Are you sure you want to end the task?")
+            .setPositiveButton("Yes") { _, _ ->
+                endTask()
+            }
+            .setNegativeButton("No") { dialog, _ ->
+                dialog.dismiss()
+            }
+
+        val dialog: AlertDialog = builder.create()
+        dialog.show()
     }
 }
