@@ -12,6 +12,8 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.HeluTales"
         tools:targetApi="31">
+
+        <!-- MainActivity -->
         <activity
             android:name=".MainActivity"
             android:exported="true"
@@ -31,6 +33,13 @@
 
         <activity android:name=".PomodoroActivity"
             android:theme="@style/Theme.HeluTalesNoActionBar" />
+
+        <!-- PomodoroActivity -->
+        <activity
+            android:name=".PomodoroActivity"
+            android:theme="@style/Theme.HeluTalesNoActionBar">
+        </activity>
+
     </application>
 
 </manifest>

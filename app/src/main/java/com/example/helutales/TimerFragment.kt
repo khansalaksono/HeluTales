@@ -31,14 +31,15 @@ class TimerFragment : Fragment() {
     private lateinit var longBreakLabel: TextView
 
     private var isWorking = false
-    private var workCycleCount = 0
+
     private lateinit var countDownTimer: CountDownTimer
     private var isPaused = false
     private var isStopped = false
-    private var remainingMillis: Long = 0
-//    private var savedProgress = 100 // Declare savedProgress here
-    private var initialDuration: Long = 0 // tambahkan properti untuk menyimpan durasi semula
 
+//    private var savedProgress = 100 // Declare savedProgress here
+    private var workCycleCount = 0
+    private var remainingMillis: Long = 0
+    private var initialDuration: Long = 0 // tambahkan properti untuk menyimpan durasi semula
     private var phaseCount = 0
     private var workPhaseCount = 0
     private var breakPhaseCount = 0
@@ -277,6 +278,12 @@ class TimerFragment : Fragment() {
         isWorking = false
         isPaused = false
         workCycleCount = 0
+        remainingMillis = 0
+        initialDuration = 0
+        phaseCount = 0
+        workPhaseCount = 0
+        breakPhaseCount = 0
+        longBreakCount = 0
         saveTaskButton.visibility = View.VISIBLE
         workCyclesLabel.visibility = View.GONE
         workPhaseLabel.visibility = View.GONE
@@ -329,7 +336,6 @@ class TimerFragment : Fragment() {
         endTaskButton.visibility = View.GONE
 
         resetTimer()
-        isStopped = true
     }
 
     private fun showConfirmationDialog() {
