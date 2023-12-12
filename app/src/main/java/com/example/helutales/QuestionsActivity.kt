@@ -21,12 +21,14 @@ class QuestionsActivity : AppCompatActivity() {
     private var quiz: Quiz? = null
     var questions: MutableMap<String, Question>? = null
     var index = 1
+    var beforeIndex = 1
     private lateinit var quizTitle: String
     private var showingQuestion = true
     private var selectedOption: String? = null
     private var selectedOptionBefore: String? = null
     private lateinit var optionAdapter: OptionAdapter
     private lateinit var description: TextView
+    private lateinit var btnNext: Button
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -35,6 +37,11 @@ class QuestionsActivity : AppCompatActivity() {
         quizTitle = intent.getStringExtra("Title") ?: ""
 
         setUpFirestore()
+
+        optionAdapter = OptionAdapter(this, Question())
+        description = findViewById<TextView>(R.id.description)
+        btnNext = findViewById<Button>(R.id.btnNext)
+
         setUpEventListener()
     }
 
@@ -61,18 +68,35 @@ class QuestionsActivity : AppCompatActivity() {
     }
 
     private fun setUpEventListener() {
-        val btnPrevious = findViewById<Button>(R.id.btnPrevious)
-        val btnNext = findViewById<Button>(R.id.btnNext)
         val btnSubmit = findViewById<Button>(R.id.btnSubmit)
-        btnPrevious.setOnClickListener {
-            index--
+
+//        btnPrevious.setOnClickListener {
+//            index--
+//            bindViews()
+//        }
+
+        btnNext.setOnClickListener {
+            if (showingQuestion) {
+                // Question -> Materi
+                selectedOption = optionAdapter.getSelectedOption()
+                if (selectedOption == null) {
+                    Toast.makeText(this, "Please select an option", Toast.LENGTH_SHORT).show()
+                    return@setOnClickListener
+                }
+                // You can do something with the selected option, for example:
+                Log.d("USER_ANSWER", "User selected option: $selectedOption")
+                showingQuestion = false
+            } else {
+                // Materi -> Question
+                index++
+                if (index > questions?.size ?: 0) {
+                    index = 1 // Loop kembali ke data 1 kalau sudah sampai akhir
+                }
+                showingQuestion = true
+            }
             bindViews()
         }
 
-        btnNext.setOnClickListener {
-            index++
-            bindViews()
-        }
 
         btnSubmit.setOnClickListener {
             if (quiz != null) {
@@ -198,36 +222,66 @@ class QuestionsActivity : AppCompatActivity() {
 //                selectedOption = null
 //            }
 //        }
-        val btnPrevious = findViewById<Button>(R.id.btnPrevious)
         val btnNext = findViewById<Button>(R.id.btnNext)
         val btnSubmit = findViewById<Button>(R.id.btnSubmit)
+        val optionList = findViewById<RecyclerView>(R.id.optionList)
+//        val btnPrevious = findViewById<Button>(R.id.btnPrevious)
+        val materiText = findViewById<TextView>(R.id.materiText)
 
-        btnPrevious.visibility = View.GONE
         btnSubmit.visibility = View.GONE
-        btnNext.visibility = View.GONE
+        optionList.visibility = View.GONE
+        materiText.visibility = View.GONE
 
         if (index == 1) { //first question
             btnNext.visibility = View.VISIBLE
         } else if (index == questions!!.size) { // last question
-            btnSubmit.visibility = View.VISIBLE
-            btnPrevious.visibility = View.VISIBLE
+            if (showingQuestion) {
+                btnNext.visibility = View.VISIBLE
+            } else {
+                btnNext.visibility = View.GONE
+                btnSubmit.visibility = View.VISIBLE
+            }
         } else { // Middle
-            btnPrevious.visibility = View.VISIBLE
             btnNext.visibility = View.VISIBLE
         }
 
+//        if (index == 1) { //first question
+//            btnNext.visibility = View.VISIBLE
+//        } else if (index == questions!!.size) { // last question
+//            btnSubmit.visibility = View.VISIBLE
+//            btnPrevious.visibility = View.VISIBLE
+//        } else { // Middle
+//            btnPrevious.visibility = View.VISIBLE
+//            btnNext.visibility = View.VISIBLE
+//        }
+
         val question = questions!!["question$index"]
 
-        val description = findViewById<TextView>(R.id.description)
-        val optionList = findViewById<RecyclerView>(R.id.optionList)
-
         question?.let {
-            description.text = it.description
-            val optionAdapter = OptionAdapter(this, it)
-            optionList.layoutManager = LinearLayoutManager(this)
-            optionList.adapter = optionAdapter
-            optionList.setHasFixedSize(true)
+            if (showingQuestion){
+                description.text = it.description
+
+                optionAdapter.updateQuestion(it)
+
+                optionList.layoutManager = LinearLayoutManager(this)
+                optionList.adapter = optionAdapter
+                optionList.setHasFixedSize(true)
+                optionList.visibility = View.VISIBLE
+                selectedOption = null
+            } else {
+                description.text = it.explanation
+
+                materiText.visibility = View.VISIBLE
+                selectedOption = null
+            }
         }
+//        question?.let {
+//            description.text = it.description
+//            val optionAdapter = OptionAdapter(this, it)
+//            optionList.layoutManager = LinearLayoutManager(this)
+//            optionList.adapter = optionAdapter
+//            optionList.setHasFixedSize(true)
+//        }
     }
 
 //    override fun onBackPressed() {

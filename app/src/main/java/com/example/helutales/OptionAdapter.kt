@@ -1,6 +1,7 @@
 package com.example.helutales
 
 import android.content.Context
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -37,17 +38,34 @@ class OptionAdapter(val context: Context, var question: Question) :
     override fun onBindViewHolder(holder: OptionViewHolder, position: Int) {
         holder.optionView.text = options[position]
         holder.itemView.setOnClickListener {
-//            Toast.makeText(context,options[position], Toast.LENGTH_SHORT).show()
-            question.userAnswer = options[position]
+            question.userAnswer = options[position] // Update the userAnswer for the current question
+            selectedOption = options[position]
             notifyDataSetChanged()
+            Log.d("QuestionActivity", "Selected Option: ${options[position]}")
         }
-        if(question.userAnswer == options[position]){
+
+        if (question.userAnswer == options[position]) {
+            //Buat selected option background
             holder.itemView.setBackgroundResource(R.drawable.option_item_selected_bg)
-        }
-        else{
+        } else {
             holder.itemView.setBackgroundResource(R.drawable.option_item_bg)
         }
     }
+
+//    override fun onBindViewHolder(holder: OptionViewHolder, position: Int) {
+//        holder.optionView.text = options[position]
+//        holder.itemView.setOnClickListener {
+////            Toast.makeText(context,options[position], Toast.LENGTH_SHORT).show()
+//            question.userAnswer = options[position]
+//            notifyDataSetChanged()
+//        }
+//        if(question.userAnswer == options[position]){
+//            holder.itemView.setBackgroundResource(R.drawable.option_item_selected_bg)
+//        }
+//        else{
+//            holder.itemView.setBackgroundResource(R.drawable.option_item_bg)
+//        }
+//    }
 
     override fun getItemCount(): Int {
         return options.size
