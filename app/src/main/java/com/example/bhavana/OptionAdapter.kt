@@ -1,4 +1,4 @@
-package com.example.helutales
+package com.example.bhavana
 
 import android.content.Context
 import android.util.Log
@@ -8,7 +8,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
-import com.example.helutales.Question
+import com.example.bhavana.Question
 
 class OptionAdapter(val context: Context, var question: Question) :
     RecyclerView.Adapter<OptionAdapter.OptionViewHolder>() {

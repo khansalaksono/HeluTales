@@ -1,4 +1,4 @@
-package com.example.helutales.ui.theme
+package com.example.bhavana.ui.theme
 
 import androidx.compose.ui.graphics.Color
 

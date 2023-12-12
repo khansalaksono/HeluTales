@@ -1,4 +1,4 @@
-package com.example.helutales
+package com.example.bhavana
 
 import android.app.AlertDialog
 import android.os.Bundle
@@ -12,7 +12,7 @@ import android.widget.ImageButton
 import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.fragment.app.Fragment
-import com.example.helutales.R
+import com.example.bhavana.R
 
 class TimerFragment : Fragment() {
 

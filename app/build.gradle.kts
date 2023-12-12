@@ -5,11 +5,11 @@ plugins {
 }
 
 android {
-    namespace = "com.example.helutales"
+    namespace = "com.example.bhavana"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.example.helutales"
+        applicationId = "com.example.bhavana"
         minSdk = 24
         targetSdk = 33
         versionCode = 1
@@ -81,7 +81,7 @@ dependencies {
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
 
-    implementation(platform("com.google.firebase:firebase-bom:32.6.0"))
+    implementation(platform("com.google.firebase:firebase-bom:32.7.0"))
     implementation("com.google.firebase:firebase-analytics")
     implementation ("com.google.code.gson:gson:2.8.8")
     implementation ("com.google.android.material:material:1.4.0")

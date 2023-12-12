@@ -7,9 +7,28 @@
   "client": [
     {
       "client_info": {
+        "mobilesdk_app_id": "1:576989399193:android:b2c21381e7b30d6d6e9008",
+        "android_client_info": {
+          "package_name": "com.company.bhavana"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBbHS9JsTC1HQoYHazrIjx0_4fo6BiSs9s"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
         "mobilesdk_app_id": "1:576989399193:android:cd6732e2163185bf6e9008",
         "android_client_info": {
-          "package_name": "com.example.helutales"
+          "package_name": "com.example.bhavana"
         }
       },
       "oauth_client": [],

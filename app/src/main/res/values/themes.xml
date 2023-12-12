@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="Theme.HeluTalesNoActionBar" parent="Theme.AppCompat.Light.NoActionBar">
+    <style name="Theme.BhavanaNoActionBar" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/HeaderColor</item>
         <item name="colorAccent">@color/colorAccent</item>
     </style>
-    <style name="Theme.HeluTales" parent="Theme.MaterialComponents.Light.DarkActionBar.Bridge">
+    <style name="Theme.Bhavana" parent="Theme.MaterialComponents.Light.DarkActionBar.Bridge">
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/HeaderColor</item>
         <item name="colorAccent">@color/colorAccent</item>

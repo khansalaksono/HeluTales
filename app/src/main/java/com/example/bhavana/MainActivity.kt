@@ -1,7 +1,6 @@
-package com.example.helutales
+package com.example.bhavana
 
-import com.example.helutales.R
-import QuizViewModel
+import com.example.bhavana.R
 import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
