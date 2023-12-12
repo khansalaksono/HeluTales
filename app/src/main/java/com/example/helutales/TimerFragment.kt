@@ -131,21 +131,21 @@ class TimerFragment : Fragment() {
                 longBreakLabel.text = "Long Break"
                 workPhaseLabel.text = ""
                 breakPhaseLabel.text = ""
-                0.3 * 60 * 1000 // Long Break: 15 menit
+                15 * 60 * 1000 // Long Break: 15 menit
             }
             phaseCount % 2 == 1 -> {
                 // Work Phase
                 workPhaseLabel.text = "Work Phase"
                 breakPhaseLabel.text = ""
                 longBreakLabel.text = ""
-                0.1 * 60 * 1000 // Work Phase: 25 menit
+                25 * 60 * 1000 // Work Phase: 25 menit
             }
             else -> {
                 // Break Phase
                 breakPhaseLabel.text = "Break Phase"
                 workPhaseLabel.text = ""
                 longBreakLabel.text = ""
-                0.2 * 60 * 1000 // Break Phase: 5 menit
+                5 * 60 * 1000 // Break Phase: 5 menit
             }
         }
 
